@@ -45,14 +45,18 @@ async def timeout(
     duration: int,
     reason: Optional[str] = None
 ):
-    await user.timeout(
-        timedelta(seconds=duration),
-        reason=reason
-    )
-
-    await interaction.response.send_message(
-        embed=Embed(
-            description=f"{user.mention} をタイムアウトしました。",
-            color=Color.orange()
+    try:
+        await user.timeout(
+            timedelta(seconds=duration),
+            reason=reason
         )
-    )
+
+        await interaction.response.send_message(
+            embed=Embed(
+                description=f"{user.mention} をタイムアウトしました。",
+                color=Color.orange()
+            )
+        )
+
+    except Exception as e:
+        print(f"timeout Error: {e}")

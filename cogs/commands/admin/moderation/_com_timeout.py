@@ -34,7 +34,7 @@ from ._group import moderation_group
         app_commands.Choice(name="15日", value=1296000),
         app_commands.Choice(name="20日", value=1728000),
         app_commands.Choice(name="25日", value=2160000),
-        app_commands.Choice(name="28日", value=2419200),
+        app_commands.Choice(name="約28日", value=2419000),
     ]
 )
 @app_commands.checks.has_permissions(administrator=True)
@@ -45,6 +45,9 @@ async def timeout(
     duration: app_commands.Choice[int],
     reason: Optional[str] = None
 ):
+    print(duration)
+    print(type(duration))
+
     try:
         await user.timeout(
             timedelta(seconds=duration.value),

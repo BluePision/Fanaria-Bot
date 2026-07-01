@@ -3,7 +3,8 @@ import os
 import signal
 import asyncio
 from pathlib import Path
-from discord import app_commands
+from discord import app_commands, AppCommandOptionType
+from discord.app_commands.models import AppCommand, Argument, AppCommandGroup
 from discord.ext import commands
 from typing import Optional, List
 from dotenv import load_dotenv
@@ -158,12 +159,26 @@ async def load_cogs(base_path: str = "cogs") -> int:
 
     return loaded
 
-def count_commands(commands: List[app_commands.Command | app_commands.Group]):
+def count_commands(commands: list[AppCommand]) -> int:
+    def count_options(options: list[Argument | AppCommandGroup]) -> int:
+        count = 0
+
+        for option in options:
+            if option.type is AppCommandOptionType.subcommand:
+                count += 1
+
+            elif option.type is AppCommandOptionType.subcommand_group:
+                count += count_options(option.options)
+
+        return count
+
     count = 0
 
     for command in commands:
-        if isinstance(command, app_commands.Group):
-            count += count_commands(command.commands)
+        # Group
+        if command.options:
+            count += count_options(command.options)
+        # 通常のスラッシュコマンド
         else:
             count += 1
 

@@ -8,8 +8,6 @@ from discord.app_commands import AppCommandContext
 from typing import Optional
 from dotenv import load_dotenv
 
-import traceback
-
 from cogs import BotLog
 from configs.main import OwnerGuildID
 
@@ -30,10 +28,6 @@ bot = commands.Bot(
         377029059886055424
     ]
 )
-
-print(discord.__version__)
-print(type(bot.tree.allowed_contexts))
-print(bot.tree.allowed_contexts)
 
 # フラグ: on_ready の一度だけ実行用
 _ready_handled = False
@@ -203,11 +197,9 @@ async def on_ready():
         ))
 
     # アプリコマンドを同期
-    print("before sync:", bot.tree.get_commands())
     try:
         synced = await bot.tree.sync()
         synced = await bot.tree.sync(guild=guild)
-        print("after sync:", synced)
         print(f"同期されたコマンドの数: {len(synced)}")
         if botlog is not None:
             await botlog.send(embed=discord.Embed(
@@ -217,7 +209,6 @@ async def on_ready():
 
     except Exception as e:
         print(f"コマンドの同期に失敗しました: {e}")
-        traceback.print_exc()
 
     await bot.change_presence(
         status=discord.Status.online,

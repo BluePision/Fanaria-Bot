@@ -3,9 +3,9 @@ import os
 import signal
 import asyncio
 from pathlib import Path
+from discord import app_commands
 from discord.ext import commands
-from discord.app_commands import AppCommandContext
-from typing import Optional
+from typing import Optional, List
 from dotenv import load_dotenv
 
 from cogs import BotLog
@@ -158,6 +158,17 @@ async def load_cogs(base_path: str = "cogs") -> int:
 
     return loaded
 
+def count_commands(commands: List[app_commands.Command | app_commands.Group]):
+    count = 0
+
+    for command in commands:
+        if isinstance(command, app_commands.Group):
+            count += count_commands(command.commands)
+        else:
+            count += 1
+
+    return count
+
 @bot.event
 async def on_ready():
     """起動時の処理"""
@@ -198,12 +209,14 @@ async def on_ready():
 
     # アプリコマンドを同期
     try:
-        synced = await bot.tree.sync()
+        await bot.tree.sync()
         synced = await bot.tree.sync(guild=guild)
-        print(f"同期されたコマンドの数: {len(synced)}")
+        command_count = count_commands(synced)
+
+        print(f"同期されたコマンドの数: {command_count}")
         if botlog is not None:
             await botlog.send(embed=discord.Embed(
-                description=f"{len(synced)}個のアプリコマンドが同期されました",
+                description=f"{command_count}個のアプリコマンドが同期されました",
                 color=discord.Color.blue()
             ))
 
@@ -214,6 +227,28 @@ async def on_ready():
         status=discord.Status.online,
         activity=discord.CustomActivity(name="起動しました")
     )
+
+async def send_command_error(interaction: discord.Interaction, error_message: str):
+    try:
+        if not interaction.response.is_done():
+            await interaction.response.send_message(error_message, ephemeral=True)
+        else:
+            await interaction.followup.send(error_message, ephemeral=True)
+
+    except Exception:
+        print(f"エラーメッセージの送信に失敗しました\nerror_message: {error_message}")
+
+    return
+
+@bot.tree.error
+async def on_app_command_error(interaction: discord.Interaction, error: app_commands.AppCommandError):
+    if isinstance(error, app_commands.CheckFailure):
+        if isinstance(error, app_commands.CommandOnCooldown):
+            await send_command_error(interaction, f"クールダウン中です。あと {error.retry_after:.1f} 秒待ってください。")
+            return
+
+        await send_command_error(interaction, "このコマンドを実行する権限がありません。必要な権限を持っているか確認してください。")
+        return
 
 if __name__ == "__main__":
     try:

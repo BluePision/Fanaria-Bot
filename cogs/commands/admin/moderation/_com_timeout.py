@@ -54,10 +54,26 @@ async def timeout(
             reason=reason
         )
 
+        user = await interaction.guild.fetch_member(user.id)
+
+        unix_ts = int(user.timed_out_until.timestamp())
+
         await interaction.response.send_message(
-            embed=Embed(
-                description=f"{user.mention} をタイムアウトしました。",
-                color=Color.orange()
+            embed=(
+                Embed(
+                    description=f"{user.mention} をタイムアウトしました。",
+                    color=Color.orange()
+                )
+                .add_field(
+                    name="理由",
+                    value=f"```{reason}```" if reason else "なし",
+                    inline=True
+                )
+                .add_field(
+                    name="解除予定",
+                    value=f"<t:{unix_ts}:F> (<t:{unix_ts}:R>)",
+                    inline=True
+                )
             )
         )
 

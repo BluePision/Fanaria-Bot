@@ -1,0 +1,71 @@
+# Python: キャッシュ・ビルド・仮想環境
+__pycache__/
+*.py[cod]
+*$py.class
+.Python
+env/
+venv/
+.venv/
+ENV/
+env.bak/
+
+# Packaging / distribution
+build/
+dist/
+*.egg-info/
+*.egg
+
+# Test / coverage
+.pytest_cache/
+.tox/
+.nox/
+htmlcov/
+.coverage
+coverage.xml
+
+# IDE/Editor
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Secrets / local configs
+# - 環境変数や API キー、個人用設定ファイルを除外
+.env
+.env.*
+local_settings.py
+credentials.json
+secrets/
+secret*
+*.pem
+*.key
+*.crt
+
+# Logs / databases
+*.log
+*.sqlite3
+*.db
+*.sqlite
+
+# Node / frontend
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-lock.yaml
+package-lock.json
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Generated docs / build outputs
+docs/_build/
+
+# Editor swap / backup files
+*~
+*.swp

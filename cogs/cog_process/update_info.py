@@ -1,0 +1,242 @@
+import asyncio
+from discord import Message, Guild, Member, TextChannel, Color, ui
+from discord.ext import commands
+from datetime import datetime, timedelta, timezone
+from typing import Optional
+
+from .botlog import BotLog
+
+from configs.main import OwnerGuildID, InfoChannelID
+
+JST = timezone(timedelta(hours=9))
+
+class UpdateInfo(commands.Cog):
+    def __init__(self, bot: commands.Bot):
+        self.bot = bot
+
+        self._cache_channel: Optional[TextChannel] = None
+        self._cache_message: Optional[Message] = None
+
+        self.guild: Optional[Guild] = None
+        self.owner: Optional[Member] = None
+        self.member_count: int = 0
+        self.humans: int = 0
+        self.bots: int = 0
+        self.boost_count: int = 0
+        self.boost_level: int = 0
+
+    async def initialize(self) -> None:
+        """
+        起動直後に呼ぶ初期化処理。
+        - サーバー / チャンネル / メッセージのキャッシュ
+        - 初回の統計値取得
+        """
+        if OwnerGuildID is None:
+            print("UpdateInfo: OwnerGuildID が未設定です")
+            return
+
+        self.guild = self.bot.get_guild(OwnerGuildID)
+        if self.guild is None:
+            # 少し待って再取得
+            for _ in range(5):
+                await asyncio.sleep(0.5)
+                self.guild = self.bot.get_guild(OwnerGuildID)
+                if self.guild:
+                    break
+
+        if self.guild is None:
+            print(f"UpdateInfo: サーバー {OwnerGuildID} が取得できませんでした")
+            return
+
+        # チャンネルキャッシュ
+        if InfoChannelID is not None:
+            ch = self.bot.get_channel(InfoChannelID)
+            if isinstance(ch, TextChannel):
+                self._cache_channel = ch
+            else:
+                try:
+                    ch = await self.bot.fetch_channel(InfoChannelID)
+                    if isinstance(ch, TextChannel):
+                        self._cache_channel = ch
+                except Exception as e:
+                    print(f"UpdateInfo: チャンネル取得に失敗: {e}")
+
+        # メッセージを履歴から探す
+        if self._cache_channel:
+            try:
+                async for msg in self._cache_channel.history(limit=200):
+                    if msg.author.id == self.bot.user.id and (msg.content.startswith("最終更新: <t:") or msg.content.startswith("サーバー情報")):
+                        self._cache_message = msg
+                        break
+            except Exception as e:
+                print(f"UpdateInfo: メッセージ履歴取得に失敗: {e}")
+
+        # 初回統計値更新
+        await self._refresh_stats()
+
+        # 起動ログを BotLog に送る
+        botlog: "BotLog" | None = self.bot.get_cog("BotLog")
+        try:
+            await botlog.send(content="UpdateInfo: 初期化完了")
+
+        except Exception:
+            pass
+
+    async def _refresh_stats(self) -> None:
+        """サーバー情報を更新する"""
+        if not self.guild:
+            return
+
+        self.owner = self.guild.owner
+        self.member_count = self.guild.member_count or 0
+        self.humans = sum(1 for m in self.guild.members if not m.bot)
+        self.bots = self.member_count - self.humans
+        self.boost_count = self.guild.premium_subscription_count or 0
+        self.boost_level = self.guild.premium_tier or 0
+
+    async def _get_info_channel(self) -> Optional[TextChannel]:
+        """キャッシュまたは API からインフォチャンネルを取得する"""
+        if self._cache_channel:
+            return self._cache_channel
+
+        if InfoChannelID is None:
+            return None
+
+        ch = self.bot.get_channel(InfoChannelID)
+        if isinstance(ch, TextChannel):
+            self._cache_channel = ch
+            return ch
+
+        try:
+            ch = await self.bot.fetch_channel(InfoChannelID)
+            if isinstance(ch, TextChannel):
+                self._cache_channel = ch
+                return ch
+
+        except Exception:
+            return None
+
+        return None
+
+    async def _get_info_message(self) -> Optional[Message]:
+        """キャッシュまたは API からインフォメッセージを取得する"""
+        if self._cache_message:
+            return self._cache_message
+
+        channel = await self._get_info_channel()
+        if channel is None:
+            return None
+
+        try:
+            async for msg in channel.history(limit=200):
+                if msg.author.id == self.bot.user.id and (msg.content.startswith("最終更新: <t:") or msg.content.startswith("サーバー情報")):
+                    self._cache_message = msg
+                    break
+
+        except Exception:
+            return None
+
+        return self._cache_message
+
+    async def create_view(self) -> ui.LayoutView:
+        """現時点のデータからLayoutViewを作成して返します"""
+        view = ui.LayoutView(timeout=None)
+        container = ui.Container(accent_color=Color.blue())
+
+        container.add_item(ui.Section(
+            ui.TextDisplay(
+                f"- サーバー名\n> ## {self.guild.name}\n"
+                f"- サーバーの作成日時\n> ## {self.guild.created_at.astimezone(JST).strftime('%Y/%m/%d %H:%M:%S')}"
+            ),
+            accessory=ui.Thumbnail(self.guild.icon.url if self.guild.icon else self.bot.user.display_avatar.url)
+        ))
+
+        # container.add_item(ui.ActionRow(self.Guild(self))) # サーバー詳細情報展開ボタン
+
+        container.add_item(ui.Separator())
+
+        container.add_item(ui.Section(
+            ui.TextDisplay(
+                "- サーバーオーナー\n"
+                f"> ## {self.owner.mention}\n"
+                f"> OwnerName: `{self.owner.name}`\n"
+                f"> OwnerID: `{self.owner.id}`"
+            ),
+            accessory=ui.Thumbnail(self.owner.display_avatar.url)
+        ))
+
+        # container.add_item(ui.ActionRow(self.Owner(self))) # オーナー詳細情報展開ボタン
+
+        container.add_item(ui.Separator())
+
+        container.add_item(ui.TextDisplay(
+            f"- 総メンバー数\n"
+            f"> ## {self.member_count}\n"
+            f"- ユーザー数\n"
+            f"> ## {self.humans}\n"
+            f"- Bot数\n"
+            f"> ## {self.bots}\n"
+        ))
+
+        container.add_item(ui.Separator())
+
+        container.add_item(ui.TextDisplay(
+            f"- サーバーブースト数\n"
+            f"> {self.boost_count}\n"
+            f"- サーバーレベル\n"
+            f"> {self.boost_level}"
+        ))
+
+        view.add_item(container)
+
+        return view
+
+    async def update(self) -> None:
+        await self._refresh_stats()
+
+        if not await self._get_info_message():
+            await self._get_info_channel()
+
+        if not self._cache_channel:
+            return
+
+        now_ts = int(datetime.now(JST).timestamp())
+        content = (
+            "サーバー情報\n"
+            f"最終更新: <t:{now_ts}:F> (<t:{now_ts}:R>)"
+        )
+
+        if self._cache_message:
+            await self._cache_message.edit(
+                content=content,
+                view=await self.create_view()
+            )
+        else:
+            self._cache_message = await self._cache_channel.send(
+                content=content,
+                view=await self.create_view()
+            )
+
+    @commands.Cog.listener("on_member_join")
+    async def on_member_join(self, member: Member):
+        if member.guild.id != OwnerGuildID:
+            return
+
+        await self.update()
+
+    @commands.Cog.listener("on_member_remove")
+    async def on_member_remove(self, member: Member):
+        if member.guild.id != OwnerGuildID:
+            return
+
+        await self.update()
+
+    @commands.Cog.listener("on_guild_update")
+    async def on_guild_update(self, before: Guild, after: Guild):
+        if after.id != OwnerGuildID:
+            return
+
+        await self.update()
+
+async def setup(bot: commands.Bot):
+    await bot.add_cog(UpdateInfo(bot))

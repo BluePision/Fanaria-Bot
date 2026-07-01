@@ -25,8 +25,15 @@ async def kick(
     )
 
     await interaction.response.send_message(
-        embed=Embed(
-            description=f"{user.mention} をキックしました。",
-            color=Color.orange()
+        embed=(
+            Embed(
+                description=f"{user.mention} をキックしました。",
+                color=Color.orange()
+            )
+            .add_field(
+                name="理由",
+                value=f"```{reason}```" if reason else "なし",
+                inline=True
+            )
         )
     )

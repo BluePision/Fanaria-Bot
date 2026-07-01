@@ -54,8 +54,15 @@ async def ban(
     )
 
     await interaction.response.send_message(
-        embed=Embed(
-            description=f"{user.mention} をBANしました。",
-            color=Color.red()
+        embed=(
+            Embed(
+                description=f"{user.mention} をBANしました。",
+                color=Color.red()
+            )
+            .add_field(
+                name="理由",
+                value=f"```{reason}```" if reason else "なし",
+                inline=True
+            )
         )
     )

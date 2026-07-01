@@ -42,12 +42,12 @@ from ._group import moderation_group
 async def timeout(
     interaction: Interaction,
     user: Member,
-    duration: int,
+    duration: app_commands.Choice[int],
     reason: Optional[str] = None
 ):
     try:
         await user.timeout(
-            timedelta(seconds=duration),
+            timedelta(seconds=duration.value),
             reason=reason
         )
 

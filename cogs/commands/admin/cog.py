@@ -1,3 +1,4 @@
+from . import _com_send_message
 from .moderation import _group, _com_ban, _com_kick, _com_timeout
 
 from discord import Object

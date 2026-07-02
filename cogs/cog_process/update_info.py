@@ -311,7 +311,6 @@ class UpdateInfo(commands.Cog):
             )
 
         async def callback(self, interaction: Interaction):
-            await self.info.update()
             await interaction.response.send_message(
                 view=await self.info.create_guild_view(),
                 ephemeral=True

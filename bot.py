@@ -1,7 +1,9 @@
 import discord
 import os
+import io
 import signal
 import asyncio
+import traceback
 from pathlib import Path
 from discord import app_commands, AppCommandOptionType
 from discord.app_commands.models import AppCommand, Argument, AppCommandGroup
@@ -284,6 +286,38 @@ async def on_app_command_error(interaction: discord.Interaction, error: app_comm
 
         await send_command_error(interaction, "このコマンドを実行する権限がありません。必要な権限を持っているか確認してください。")
         return
+
+@bot.event
+async def on_error(event, *args, **kwargs):
+    global botlog
+
+    error_text = traceback.format_exc()
+    print(f"[on_error] {event}\n\n{error_text}")
+
+    view = discord.ui.LayoutView(timeout=None)
+    container = discord.ui.Container(accent_color=discord.Color.red())
+
+    content = f"# [on_error] {event}\n\n```{error_text}```"
+
+    try:
+        container.add_item(discord.ui.TextDisplay(content))
+        view.add_item(container)
+
+        await botlog.send(layoutview=view)
+        return
+
+    except Exception:
+        pass
+
+    file = discord.File(
+        fp=io.BytesIO(error_text.encode("utf-8")),
+        filename=f"error_{event}.txt"
+    )
+
+    await botlog.send(
+        content=f"[on_error] {event}（ログはファイル）",
+        file=file
+    )
 
 if __name__ == "__main__":
     try:

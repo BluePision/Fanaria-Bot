@@ -9,7 +9,7 @@ from discord.ext import commands
 from typing import Optional, List
 from dotenv import load_dotenv
 
-from cogs import BotLog
+from cogs import BotLog, UpdateInfo
 from configs.main import OwnerGuildID
 
 
@@ -34,6 +34,8 @@ bot = commands.Bot(
 _ready_handled = False
 
 botlog: Optional[BotLog] = None
+
+update_info: Optional[UpdateInfo] = None
 
 guild = discord.Object(id=OwnerGuildID)
 
@@ -201,7 +203,7 @@ def count_commands(commands: list[AppCommand]) -> int:
 @bot.event
 async def on_ready():
     """起動時の処理"""
-    global _ready_handled, botlog
+    global _ready_handled, botlog, update_info
 
     if _ready_handled:
         print(f"{bot.user} に再接続")
@@ -251,6 +253,10 @@ async def on_ready():
 
     except Exception as e:
         print(f"コマンドの同期に失敗しました: {e}")
+
+    update_info = UpdateInfo(bot)
+
+    await update_info.initialize()
 
     await bot.change_presence(
         status=discord.Status.online,

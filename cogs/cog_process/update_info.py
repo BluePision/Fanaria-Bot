@@ -82,6 +82,8 @@ class UpdateInfo(commands.Cog):
         except Exception:
             pass
 
+        await self.update()
+
     async def _refresh_stats(self) -> None:
         """サーバー情報を更新する"""
         if not self.guild:
@@ -129,7 +131,7 @@ class UpdateInfo(commands.Cog):
 
         try:
             async for msg in channel.history(limit=200):
-                if msg.author.id == self.bot.user.id and (msg.content.startswith("最終更新: <t:") or msg.content.startswith("サーバー情報")):
+                if msg.author.id == self.bot.user.id:
                     self._cache_message = msg
                     break
 
@@ -187,6 +189,14 @@ class UpdateInfo(commands.Cog):
             f"> {self.boost_level}"
         ))
 
+        container.add_item(ui.Separator())
+
+        now_ts = int(datetime.now(JST).timestamp())
+
+        container.add_item(ui.TextDisplay(
+            f"-# 最終更新: <t:{now_ts}:F> (<t:{now_ts}:R>)"
+        ))
+
         view.add_item(container)
 
         return view
@@ -200,20 +210,12 @@ class UpdateInfo(commands.Cog):
         if not self._cache_channel:
             return
 
-        now_ts = int(datetime.now(JST).timestamp())
-        content = (
-            "サーバー情報\n"
-            f"最終更新: <t:{now_ts}:F> (<t:{now_ts}:R>)"
-        )
-
         if self._cache_message:
             await self._cache_message.edit(
-                content=content,
                 view=await self.create_view()
             )
         else:
             self._cache_message = await self._cache_channel.send(
-                content=content,
                 view=await self.create_view()
             )
 
@@ -239,4 +241,7 @@ class UpdateInfo(commands.Cog):
         await self.update()
 
 async def setup(bot: commands.Bot):
-    await bot.add_cog(UpdateInfo(bot))
+    cog = UpdateInfo(bot)
+    await bot.add_cog(cog)
+
+    bot.update_info = cog

@@ -103,7 +103,7 @@ class Jihou:
 JihouData = [
     JihouUser(
         id = 1102936594362671235,
-        weight = 59.0,
+        weight = 49.0,
         messages = {
             JihouTime.morning: [
                 "おはよう", "おは", "よく寝た？", "おはようございます。\n寝起きにBANはいかがですか？\nあ、いや？じゃあTOならどう？", "起きて働け社畜精神の日本人諸君",
@@ -130,7 +130,7 @@ JihouData = [
     ),
     JihouUser(
         id = 1333027499302453273,
-        weight = 30.0,
+        weight = 40.0,
         messages = {
             JihouTime.morning: [
                 "おはよう", "おはようございます", "おは", "O'ha", "O\"ha", "O'ha!", "o'ha", "おはよ", "めっちゃ寝てた", "おはぬーん", "ぐもに", "おはやつ",

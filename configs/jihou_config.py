@@ -8,6 +8,11 @@ from enum import Enum
 class JihouTime(Enum):
     """
     時報専用の時報の時間用のクラス
+
+    Args:
+        morning: 07:00
+        night: 22:45
+        midnight: 02:30
     """
 
     morning = "07:00"
@@ -63,7 +68,8 @@ class Jihou:
     ):
         """
         Args:
-            webhook (str): Discord WebhookURL。時報の送信に使われる。
+            bot (commands.Bot): Botクライアント。Webhookの成形に使われる。
+            webhookurl (str): Discord WebhookURL。時報の送信に使われる。
         """
         self.webhook = Webhook.from_url(
             webhookurl,

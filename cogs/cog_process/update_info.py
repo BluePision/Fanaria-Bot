@@ -1,5 +1,5 @@
 import asyncio
-from discord import Interaction, Message, Guild, Member, TextChannel, Embed, Color, ui, components, ButtonStyle, HTTPException
+from discord import Interaction, Message, Guild, Member, TextChannel, Embed, Color, ui, components, ButtonStyle, HTTPException, AllowedMentions
 from discord.ext import commands
 from datetime import datetime, timedelta, timezone
 from typing import Optional
@@ -54,7 +54,7 @@ class UpdateInfo(commands.Cog):
         if self._cache_channel:
             try:
                 async for msg in self._cache_channel.history(limit=200):
-                    if msg.author.id == self.bot.user.id and (msg.content.startswith("最終更新: <t:") or msg.content.startswith("サーバー情報")):
+                    if msg.author.id == self.bot.user.id:
                         self._cache_message = msg
                         break
             except Exception as e:
@@ -63,18 +63,19 @@ class UpdateInfo(commands.Cog):
         # 初回統計値更新
         await self._refresh_stats()
 
+        await self.update()
+
         # 起動ログを BotLog に送る
         botlog: "BotLog" | None = self.bot.get_cog("BotLog")
         try:
             await botlog.send(embed=Embed(
                 title="UpdateInfo",
-                description="更新しました"
+                description=f"起動しました\n\n<#{InfoChannelID}> を更新しました",
+                color=Color.blue()
             ))
 
         except Exception:
             pass
-
-        await self.update()
 
     async def _refresh_stats(self) -> None:
         """サーバー情報を更新する"""
@@ -225,11 +226,13 @@ class UpdateInfo(commands.Cog):
 
         if self._cache_message:
             await self._cache_message.edit(
-                view=await self.create_view()
+                view=await self.create_view(),
+                allowed_mentions=AllowedMentions.none()
             )
         else:
             self._cache_message = await self._cache_channel.send(
-                view=await self.create_view()
+                view=await self.create_view(),
+                allowed_mentions=AllowedMentions.none()
             )
 
     @commands.Cog.listener("on_member_join")

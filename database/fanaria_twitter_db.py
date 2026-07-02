@@ -1,8 +1,10 @@
 from pathlib import Path
 import sqlite3
 
+DB_PATH = Path(__file__).resolve().parents[1] / "data" / "twitter.db"
+
 class FanariaTwitterDB:
-    def __init__(self, path: str = "./data/twitter.db"):
+    def __init__(self, path: str | Path = DB_PATH):
         print(f"データベースを開きます: {path}")
 
         self.path = Path(path)

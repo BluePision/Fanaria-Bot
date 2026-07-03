@@ -11,11 +11,13 @@ class JihouTime(Enum):
 
     Args:
         morning: 07:00
+        noon: 12:00
         night: 22:45
         midnight: 02:30
     """
 
     morning = "07:00"
+    noon = "12:00"
     night = "22:45"
     midnight = "02:30"
 
@@ -76,11 +78,38 @@ class Jihou:
             client=bot
         )
 
-    def choice_user(self) -> JihouUser:
-        """Weightを基にランダムにユーザーを選出する"""
+    def choice_user(
+            self,
+            time: str | JihouTime | None = None
+        ) -> JihouUser:
+        """
+        Weightを基にランダムにユーザーを選出する
+
+        もし時間の指定があればその時間のリストが存在するユーザーの中から選出する
+        """
+        if time is None:
+            users = JihouData
+
+        else:
+            if isinstance(time, str):
+                try:
+                    time = JihouTime(time)
+
+                except ValueError:
+                    raise ValueError(f"{time} が存在しません")
+
+            users = [
+                user
+                for user in JihouData
+                if time in user.messages and user.messages[time]
+            ]
+
+            if not users:
+                raise ValueError(f"{time} を持っているユーザーが存在しません")
+
         return random.choices(
-            JihouData,
-            weights=[u.weight for u in JihouData],
+            users,
+            weights=[user.weight for user in users],
             k=1
         )[0]
 
@@ -110,7 +139,7 @@ class Jihou:
 JihouData = [
     JihouUser( # てぃ
         id = 1102936594362671235,
-        weight = 20.0,
+        weight = 15.0,
         messages = {
             JihouTime.morning: [
                 "おはよう", "おは", "よく寝た？", "おはようございます。\n寝起きにBANはいかがですか？\nあ、いや？じゃあTOならどう？", "起きて働け社畜精神の日本人諸君",
@@ -121,6 +150,9 @@ JihouData = [
                 "起きたくないんじゃないんです！\n布団が私を放してくれないんです！！！", "起きろよ！！！私が言えることじゃないけど！！！！！",
                 "\\u304A\\u306F\\u3088\\u3046",
                 "目覚まし時計　鳴り止め時計　Oh Yeah！\n目覚まし時計　止めろよ時計　Wow Wow\n目覚まし時計　起きろよボケ　Oh Yeah！\n目覚まし時計　目覚まし時計　Wow Wow Yeah！\n\n[【MV】睡魔/マサイ a.k.a マサ寝坊【目覚まし時計の歌（Full Ver.）】](https://youtu.be/CzVOUBxQs6c)"
+            ],
+            JihouTime.noon: [
+                "まだ寝てるんですか？だとしたら多分あなたは以下略", "昼マックの出番です", "ｲﾝｽﾀﾝﾄﾗｰﾒﾝ!"
             ],
             JihouTime.night: [
                 "おやすみ", "おやす", "寝る。おやすみ", "zzz", "寝てくださーい(フライパンｶﾞﾝｶﾞﾝ)", "はよねろやーい(ドアぶち破り)", "ねないこだれだ", "おやすみんみんぜみ", "寝ろよ子供たち",
@@ -137,7 +169,7 @@ JihouData = [
     ),
     JihouUser( # おれお
         id = 1333027499302453273,
-        weight = 79.0,
+        weight = 64.0,
         messages = {
             JihouTime.morning: [
                 "おはよう", "おはようございます", "おは", "O'ha", "O\"ha", "O'ha!", "o'ha", "おはよ", "めっちゃ寝てた", "おはぬーん", "ぐもに", "おはやつ",
@@ -162,6 +194,18 @@ JihouData = [
                 "おやすみ", "夜更かし", "意識飛んでたわ\n\n勉強します", "放置してた", "うんち", "うんこ", "💩",
                 "おはよう", "ｵﾚｵｦｲｼﾞﾒﾇﾝﾃﾞ!!"
             ]
+        }
+    ),
+    JihouUser( # はるみん
+        id = 1133323483523325984,
+        weight = 20.0,
+        messages = {
+            JihouTime.morning: [],
+            JihouTime.noon: [
+                "おそよう"
+            ],
+            JihouTime.night: [],
+            JihouTime.midnight: []
         }
     ),
     JihouUser( # 岩間凛音

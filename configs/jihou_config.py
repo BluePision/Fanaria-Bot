@@ -77,6 +77,7 @@ class Jihou:
         )
 
     def choice_user(self) -> JihouUser:
+        """Weightを基にランダムにユーザーを選出する"""
         return random.choices(
             JihouData,
             weights=[u.weight for u in JihouData],
@@ -107,7 +108,7 @@ class Jihou:
             return
 
 JihouData = [
-    JihouUser(
+    JihouUser( # てぃ
         id = 1102936594362671235,
         weight = 49.0,
         messages = {
@@ -134,9 +135,9 @@ JihouData = [
             ]
         }
     ),
-    JihouUser(
+    JihouUser( # おれお
         id = 1333027499302453273,
-        weight = 40.0,
+        weight = 41.0,
         messages = {
             JihouTime.morning: [
                 "おはよう", "おはようございます", "おは", "O'ha", "O\"ha", "O'ha!", "o'ha", "おはよ", "めっちゃ寝てた", "おはぬーん", "ぐもに", "おはやつ",
@@ -163,7 +164,7 @@ JihouData = [
             ]
         }
     ),
-    JihouUser(
+    JihouUser( # 岩間凛音
         id = 1448134124580896830,
         weight = 10.0,
         messages = {
@@ -175,21 +176,6 @@ JihouData = [
             ],
             JihouTime.midnight: [
                 "いつまで起きてるの……", "もう寝なよ～……"
-            ]
-        }
-    ),
-    JihouUser(
-        id = 1334120019210010644,
-        weight = 1.0,
-        messages = {
-            JihouTime.morning: [
-                "おはよう", "おはよ～", "おはよ", "もう少し寝たいな"
-            ],
-            JihouTime.night: [
-                "おやすみ", "おやすみ～"
-            ],
-            JihouTime.midnight: [
-                "いつまで起きてるの……"
             ]
         }
     )

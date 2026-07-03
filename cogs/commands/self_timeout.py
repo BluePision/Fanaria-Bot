@@ -10,7 +10,6 @@ class SelfTimeOut(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
 
-    # --- オートコンプリート（分） ---
     @app_commands.autocomplete()
     async def _timeout_minute_autocomplete(self, interaction: discord.Interaction, current: str):
         """0～59分を選択できるオートコンプリート"""
@@ -22,7 +21,6 @@ class SelfTimeOut(commands.Cog):
         filtered = [c for c in all_choices if input_text in c.name.lower()]
         return filtered[:25]
 
-    # --- オートコンプリート（秒） ---
     @app_commands.autocomplete()
     async def _timeout_second_autocomplete(self, interaction: discord.Interaction, current: str):
         """0～59秒を選択できるオートコンプリート"""
@@ -34,7 +32,7 @@ class SelfTimeOut(commands.Cog):
         filtered = [c for c in all_choices if input_text in c.name.lower()]
         return filtered[:25]
 
-    # --- スラッシュコマンド本体 ---
+    # スラッシュコマンド
     @app_commands.command(
         name="self_timeout",
         description="セルフタイムアウトを実行します"
@@ -61,23 +59,23 @@ class SelfTimeOut(commands.Cog):
         minute: int = 0,
         second: int = 0
     ):
-        # ギルド制限（OwnerGuildID が設定されている場合のみチェック）
+        # サーバーの確認
         if OwnerGuildID is not None and interaction.guild_id != OwnerGuildID:
             await interaction.response.send_message("このBotは特定サーバー専用です", ephemeral=True)
             return
 
-        # interaction.user が Member か確認（DM 等の可能性を排除）
+        # interaction.user が Member か確認
         member = interaction.user if isinstance(interaction.user, discord.Member) else interaction.guild.get_member(interaction.user.id)
         if member is None:
             await interaction.response.send_message("メンバー情報が取得できませんでした", ephemeral=True)
             return
 
-        # サーバーオーナーは不可
+        # サーバーオーナーは正気か問う
         if member.id == interaction.guild.owner_id:
             await interaction.response.send_message("オーナーさん！？気を確かに！！あなたはオーナーですよ！？", ephemeral=True)
             return
 
-        # 管理者やモデレート権限を持つユーザーは不可
+        # 管理者とかの権限を持つユーザーは拒否する
         if member.guild_permissions.administrator or member.guild_permissions.moderate_members:
             await interaction.response.send_message("管理者権限を持つユーザーはセルフタイムアウトできません", ephemeral=True)
             return
@@ -87,7 +85,7 @@ class SelfTimeOut(commands.Cog):
             await interaction.response.send_message("タイムアウト時間は 1 秒以上にしてください", ephemeral=True)
             return
 
-        # 分解
+        # 時間を分解して見やすくする
         days, remainder = divmod(final_seconds, 86400)
         hours, remainder = divmod(remainder, 3600)
         minutes, seconds = divmod(remainder, 60)

@@ -51,6 +51,9 @@ class FanariaTwitter(commands.Cog):
 
         self.database = FanariaTwitterDB()
 
+    def cog_unload(self):
+        self.database.close()
+
     async def get_channel(self) -> Optional[discord.TextChannel]:
         """キャッシュとAPIを使ってチャンネルを返す"""
 

@@ -35,6 +35,7 @@ class FanariaTwitterDB:
         print("テーブルの準備が完了しました。")
 
     def close(self):
+        """データベースを閉じる"""
         print("データベースを閉じます。")
 
         self.conn.close()

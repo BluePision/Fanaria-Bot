@@ -30,7 +30,7 @@ async def check_not_mod_permission(
     # まぁ煽る
     if interaction.user.id == member.id:
         await interaction.response.send_message(
-            "あなたをタイムアウトしろって言うんですか？",
+            "あなたを処罰しろって言うんですか？",
             ephemeral=True
         )
         return True

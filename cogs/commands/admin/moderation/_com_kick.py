@@ -2,6 +2,7 @@ from discord import app_commands, Interaction, Member, Embed, Color
 from typing import Optional
 
 from ._group import moderation_group
+from ._check import check_not_mod_permission
 
 
 @moderation_group.command(
@@ -19,21 +20,28 @@ async def kick(
     user: Member,
     reason: Optional[str] = None
 ):
-    await interaction.guild.kick(
-        user,
-        reason=reason
-    )
+    if await check_not_mod_permission(interaction, user):
+        return
 
-    await interaction.response.send_message(
-        embed=(
-            Embed(
-                description=f"{user.mention} をキックしました。",
-                color=Color.orange()
-            )
-            .add_field(
-                name="理由",
-                value=f"```{reason}```" if reason else "なし",
-                inline=True
+    try:
+        await interaction.guild.kick(
+            user,
+            reason=reason
+        )
+
+        await interaction.response.send_message(
+            embed=(
+                Embed(
+                    description=f"{user.mention} をキックしました。",
+                    color=Color.orange()
+                )
+                .add_field(
+                    name="理由",
+                    value=f"```{reason}```" if reason else "なし",
+                    inline=True
+                )
             )
         )
-    )
+
+    except Exception as e:
+        print(f"kick Error: {e}")

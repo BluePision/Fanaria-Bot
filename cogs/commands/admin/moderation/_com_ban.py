@@ -2,6 +2,7 @@ from discord import app_commands, Interaction, Member, Embed, Color
 from typing import Optional
 
 from ._group import moderation_group
+from ._check import check_not_mod_permission
 
 
 @moderation_group.command(
@@ -47,22 +48,29 @@ async def ban(
     delete_message_seconds: Optional[int] = 0,
     reason: Optional[str] = None
 ):
-    await interaction.guild.ban(
-        user,
-        reason=reason,
-        delete_message_seconds=delete_message_seconds
-    )
+    if await check_not_mod_permission(interaction, user):
+        return
 
-    await interaction.response.send_message(
-        embed=(
-            Embed(
-                description=f"{user.mention} をBANしました。",
-                color=Color.red()
-            )
-            .add_field(
-                name="理由",
-                value=f"```{reason}```" if reason else "なし",
-                inline=True
+    try:
+        await interaction.guild.ban(
+            user,
+            reason=reason,
+            delete_message_seconds=delete_message_seconds
+        )
+
+        await interaction.response.send_message(
+            embed=(
+                Embed(
+                    description=f"{user.mention} をBANしました。",
+                    color=Color.red()
+                )
+                .add_field(
+                    name="理由",
+                    value=f"```{reason}```" if reason else "なし",
+                    inline=True
+                )
             )
         )
-    )
+
+    except Exception as e:
+        print(f"ban Error: {e}")

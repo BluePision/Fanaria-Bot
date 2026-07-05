@@ -3,6 +3,7 @@ from datetime import timedelta
 from typing import Optional
 
 from ._group import moderation_group
+from ._check import check_not_mod_permission
 
 
 @moderation_group.command(
@@ -45,8 +46,12 @@ async def timeout(
     duration: app_commands.Choice[int],
     reason: Optional[str] = None
 ):
-    print(duration)
-    print(type(duration))
+    if await check_not_mod_permission(interaction, user):
+        return
+
+    if user.guild_permissions.moderate_members:
+        await interaction.response.send_message("タイムアウトできる権限を持っているユーザーはタイムアウトできません", ephemeral=True)
+        return
 
     try:
         await user.timeout(

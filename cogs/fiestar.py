@@ -94,8 +94,9 @@ class Fiestar(commands.Cog):
         await asyncio.sleep(0.1)
         await message.add_reaction("🔖")
         await asyncio.sleep(0.1)
+
         await message.create_thread(
-            name=f"{message.author.display_name}の投稿のコメント欄",
+            name=f"{message.author.name} [{message.author.id}] の投稿のコメント欄",
             auto_archive_duration=1440
         )
 

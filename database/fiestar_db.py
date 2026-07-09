@@ -1,9 +1,9 @@
 from pathlib import Path
 import sqlite3
 
-DB_PATH = Path(__file__).resolve().parents[1] / "data" / "twitter.db"
+DB_PATH = Path(__file__).resolve().parents[1] / "data" / "fiestar.db"
 
-class FanariaTwitterDB:
+class FiestarDB:
     def __init__(self, path: str | Path = DB_PATH):
         print(f"データベースを開きます: {path}")
 
@@ -22,7 +22,7 @@ class FanariaTwitterDB:
         print("テーブルを確認・作成します。")
 
         self.cursor.execute("""
-            CREATE TABLE IF NOT EXISTS fanaria_twitter_reactions (
+            CREATE TABLE IF NOT EXISTS fiestar_reactions (
                 user_id INTEGER NOT NULL,
                 message_id INTEGER NOT NULL,
                 reaction TEXT NOT NULL,
@@ -63,7 +63,7 @@ class FanariaTwitterDB:
         )
 
         self.cursor.execute("""
-            INSERT OR IGNORE INTO fanaria_twitter_reactions
+            INSERT OR IGNORE INTO fiestar_reactions
             (user_id, message_id, reaction)
             VALUES (?, ?, ?)
         """, (user_id, message_id, reaction))
@@ -95,7 +95,7 @@ class FanariaTwitterDB:
         )
 
         self.cursor.execute("""
-            DELETE FROM fanaria_twitter_reactions
+            DELETE FROM fiestar_reactions
             WHERE user_id = ?
               AND message_id = ?
               AND reaction = ?
@@ -131,7 +131,7 @@ class FanariaTwitterDB:
 
         row = self.cursor.execute("""
             SELECT 1
-            FROM fanaria_twitter_reactions
+            FROM fiestar_reactions
             WHERE user_id = ?
               AND message_id = ?
               AND reaction = ?
@@ -168,7 +168,7 @@ class FanariaTwitterDB:
 
         rows = self.cursor.execute("""
             SELECT message_id
-            FROM fanaria_twitter_reactions
+            FROM fiestar_reactions
             WHERE user_id = ?
               AND reaction = ?
         """, (user_id, reaction)).fetchall()
@@ -187,7 +187,7 @@ class FanariaTwitterDB:
             message_id (int): 削除されたメッセージID
         """
         self.cursor.execute("""
-            DELETE FROM fanaria_twitter_reactions
+            DELETE FROM fiestar_reactions
             WHERE message_id = ?
         """, (message_id,))
 

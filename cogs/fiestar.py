@@ -4,14 +4,14 @@ import asyncio
 from functools import wraps
 from typing import Optional
 
-from configs.main import OwnerGuildID, FanariaTwitterChannelID
-from database.fanaria_twitter_db import FanariaTwitterDB
+from configs.main import OwnerGuildID, FiestarChannelID
+from database.fiestar_db import FiestarDB
 
 emoji_map = {
     "👍": "good",
     "⭐": "star",
     "❤️": "like",
-    "🔁": "retweet",
+    "🔁": "repost",
     "🔖": "bookmark"
 }
 
@@ -38,18 +38,18 @@ def is_true_channel(func):
         if guild_id != OwnerGuildID:
             return
 
-        if channel_id != FanariaTwitterChannelID:
+        if channel_id != FiestarChannelID:
             return
 
         return await func(self, obj, *args, **kwargs)
 
     return wrapper
 
-class FanariaTwitter(commands.Cog):
+class Fiestar(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
 
-        self.database = FanariaTwitterDB()
+        self.database = FiestarDB()
 
     def cog_unload(self):
         self.database.close()
@@ -57,13 +57,13 @@ class FanariaTwitter(commands.Cog):
     async def get_channel(self) -> Optional[discord.TextChannel]:
         """キャッシュとAPIを使ってチャンネルを返す"""
 
-        channel = self.bot.get_channel(FanariaTwitterChannelID)
+        channel = self.bot.get_channel(FiestarChannelID)
         if isinstance(channel, discord.TextChannel):
             self.channel = channel
             return channel
 
         try:
-            channel = await self.bot.fetch_channel(FanariaTwitterChannelID)
+            channel = await self.bot.fetch_channel(FiestarChannelID)
             self.channel = channel
             return channel
 
@@ -129,7 +129,7 @@ class FanariaTwitter(commands.Cog):
                 payload.message_id
             )
 
-        if reaction_type == "retweet":
+        if reaction_type == "repost":
             message = discord.utils.get(
                 self.bot.cached_messages,
                 id=payload.message_id
@@ -148,7 +148,7 @@ class FanariaTwitter(commands.Cog):
                 url=message.jump_url
             )
             main_embed.set_footer(
-                text=f"{user.display_name} | {payload.user_id} さんがリツイートしました",
+                text=f"{user.display_name} | {payload.user_id} さんがリポストしました",
                 icon_url=user.display_avatar.url
             )
 
@@ -194,7 +194,7 @@ class FanariaTwitter(commands.Cog):
             payload.message_id
         )
 
-        if reaction_type == "retweet":
+        if reaction_type == "repost":
             message = discord.utils.get(
                 self.bot.cached_messages,
                 id=payload.message_id
@@ -215,7 +215,7 @@ class FanariaTwitter(commands.Cog):
                 if reply.embeds:
                     embed = reply.embeds[0]
                     footer = embed.footer.text if embed.footer else ""
-                    if f"{payload.user_id} さんがリツイートしました" in footer:
+                    if f"{payload.user_id} さんがリポストしました" in footer or f"{payload.user_id} さんがリツイートしました" in footer:
                         await reply.delete()
                         break
 
@@ -237,4 +237,4 @@ class FanariaTwitter(commands.Cog):
         self.database.remove_message(message.id)
 
 async def setup(bot: commands.Bot):
-    await bot.add_cog(FanariaTwitter(bot))
+    await bot.add_cog(Fiestar(bot))

@@ -226,14 +226,22 @@ class Fiestar(commands.Cog):
         if message.author.bot:
             return
 
-        try:
-            if message.thread:
-                await message.thread.delete(
-                    reason="元投稿が削除されたため"
-                )
+        thread = message.thread
 
-        except discord.HTTPException as e:
-            print(f"スレッド削除失敗: {e}")
+        if thread is None:
+            try:
+                thread = await self.bot.fetch_channel(message.id)
+
+            except discord.NotFound:
+                thread = None
+
+            except discord.HTTPException as e:
+                print(f"スレッド削除失敗: {e}")
+
+        if thread is not None:
+            await thread.delete(
+                reason="元投稿が削除されたため"
+            )
 
         self.database.remove_message(message.id)
 

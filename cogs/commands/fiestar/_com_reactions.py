@@ -4,8 +4,8 @@ from discord.ext import commands
 from typing import Optional, List
 
 from ._group import fiestar_group
+from ._process_db_connect import fiestar_database
 
-from fiestar import fiestar_database
 from configs.main import OwnerGuildID, FiestarChannelID
 from configs.fiestar_config import emoji_map
 

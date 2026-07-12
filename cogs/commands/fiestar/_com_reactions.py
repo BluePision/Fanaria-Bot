@@ -12,6 +12,9 @@ from configs.main import OwnerGuildID, FiestarChannelID
 from configs.fiestar_config import emoji_map
 
 
+# 1ページに含められるメッセージの最大数の指定
+MaxMessage: int = 5
+
 class ReactionList:
     def __init__(self, bot: commands.Bot, user: User):
         self.bot: commands.Bot = bot
@@ -62,13 +65,9 @@ class ReactionList:
         return message
 
     async def get_ten_messages(self) -> List[Message]:
-        """
-        現在のページで表示するべきメッセージのリスト10件を返す
-
-        もしself.messages（これまでのキャッシュ）にあるならそこから10件を取って返す
-        """
-        start = self.page * 10
-        end = start + 10
+        """現在のページで表示するべきメッセージのリストを返す"""
+        start = self.page * MaxMessage
+        end = start + MaxMessage
 
         messages = []
 
@@ -86,11 +85,11 @@ class ReactionList:
         return messages
 
     def get_page_count(self) -> int:
-        """10件ごとに区切った最大ページ数を返す"""
+        """1ページあたりの件数を基準とした最大ページ数を返す"""
         if not self.message_ids:
             return 1
 
-        return math.ceil(len(self.message_ids) / 10)
+        return math.ceil(len(self.message_ids) / MaxMessage)
 
     async def create_view(self) -> ui.LayoutView:
         view = ui.LayoutView(timeout=300)
@@ -109,7 +108,7 @@ class ReactionList:
                 content = re.sub(
                     r"<a?:[A-Za-z0-9_]+:\d+>|:[A-Za-z0-9_]+:",
                     "[emoji]",
-                    message.content
+                    utils.escape_markdown(message.content)
                 )
 
                 content = (

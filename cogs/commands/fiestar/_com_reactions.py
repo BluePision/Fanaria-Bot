@@ -99,13 +99,10 @@ class ReactionList:
         container.add_item(ui.TextDisplay(
             f"# Fiestar {self.now_reaction} リアクション履歴"
         ))
-
         container.add_item(ui.ActionRow(self.EmojiSelect(self)))
-
         container.add_item(ui.Separator())
 
         messages = await self.get_ten_messages()
-
         if messages:
             for message in messages:
 
@@ -128,7 +125,10 @@ class ReactionList:
                 )
 
                 container.add_item(ui.Section(
-                    f"> {content}",
+                    ui.TextDisplay(
+                        f"-# - MessageID`{message.id}`"
+                        f"> {content}"
+                    ),
                     accessory=ui.Button(
                         label="メッセージ先",
                         url=message.jump_url,
@@ -159,7 +159,6 @@ class ReactionList:
         container.add_item(buttons)
 
         view.add_item(container)
-        print("[ReactionList] view created")
 
         return view
 
@@ -168,7 +167,7 @@ class ReactionList:
             self.parent_class = parent_class
 
             options = [
-                SelectOption(label=display, value=value)
+                SelectOption(label=f"{display} - {value}", value=value)
                 for display, value in emoji_map.items()
             ]
 

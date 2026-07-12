@@ -3,6 +3,7 @@ from discord import app_commands, Interaction, Message, InteractionMessage, Text
 from discord.ext import commands
 from typing import Optional, List
 import traceback
+import re
 
 from ._group import fiestar_group
 from ._process_db_connect import fiestar_database
@@ -108,14 +109,20 @@ class ReactionList:
         if messages:
             for message in messages:
 
+                content = re.sub(
+                    r"<a?:[A-Za-z0-9_]+:\d+>|:[A-Za-z0-9_]+:",
+                    "[emoji]",
+                    message.content
+                )
+
                 content = (
-                    f"{message.content.splitlines()[0]} …以下略"
-                    if "\n" in message.content
+                    f"{content.splitlines()[0]} …以下略"
+                    if "\n" in content
                     else (
-                        f"{message.content[:25]} …以下略"
-                        if len(message.content) > 30
-                        else message.content
-                        if message.content != ""
+                        f"{content[:25]} …以下略"
+                        if len(content) > 30
+                        else content
+                        if content.strip()
                         else "(No Text)"
                     )
                 )

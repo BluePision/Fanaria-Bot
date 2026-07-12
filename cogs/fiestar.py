@@ -5,15 +5,9 @@ from functools import wraps
 from typing import Optional
 
 from configs.main import OwnerGuildID, FiestarChannelID
+from configs.fiestar_config import emoji_map
 from database.fiestar_db import FiestarDB
 
-emoji_map = {
-    "👍": "good",
-    "⭐": "star",
-    "❤️": "like",
-    "🔁": "repost",
-    "🔖": "bookmark"
-}
 
 def is_true_channel(func):
     @wraps(func)

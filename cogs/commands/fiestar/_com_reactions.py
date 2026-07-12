@@ -126,8 +126,8 @@ class ReactionList:
 
                 container.add_item(ui.Section(
                     ui.TextDisplay(
-                        f"-# - MessageID`{message.id}`"
-                        f"> {content}"
+                        f"-# - MessageID`{message.id}`\n"
+                        f"## > {content}"
                     ),
                     accessory=ui.Button(
                         label="メッセージ先",

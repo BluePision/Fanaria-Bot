@@ -2,6 +2,7 @@ import math
 from discord import app_commands, Interaction, Message, InteractionMessage, TextChannel, AllowedMentions, ui, components, ButtonStyle, SelectOption, Member, User, Embed, Color, utils
 from discord.ext import commands
 from typing import Optional, List
+import traceback
 
 from ._group import fiestar_group
 from ._process_db_connect import fiestar_database
@@ -31,7 +32,6 @@ class ReactionList:
 
     async def get_channel(self) -> Optional[TextChannel]:
         """キャッシュとAPIを使ってチャンネルを返す"""
-
         channel = self.bot.get_channel(FiestarChannelID)
         if isinstance(channel, TextChannel):
             self.fiestar_channel = channel
@@ -47,7 +47,6 @@ class ReactionList:
 
     async def get_message(self, message_id: int) -> Optional[Message]:
         """メッセージを取得する"""
-
         message = utils.get(
             self.bot.cached_messages,
             id=message_id
@@ -73,7 +72,6 @@ class ReactionList:
         messages = []
 
         for message_id in self.message_ids[start:end]:
-
             message = utils.get(self.messages, id=message_id)
 
             if message is None:
@@ -88,7 +86,6 @@ class ReactionList:
 
     def get_page_count(self) -> int:
         """10件ごとに区切った最大ページ数を返す"""
-
         if not self.message_ids:
             return 1
 
@@ -99,7 +96,7 @@ class ReactionList:
         container = ui.Container(accent_color=Color.blue())
 
         container.add_item(ui.TextDisplay(
-            "# Fiestar リアクション履歴"
+            f"# Fiestar {self.now_reaction} リアクション履歴"
         ))
 
         container.add_item(ui.ActionRow(self.EmojiSelect(self)))
@@ -111,7 +108,17 @@ class ReactionList:
         if messages:
             for message in messages:
 
-                content = f"{message.content[:25]} …以下略" if len(message.content) > 30 else message.content
+                content = (
+                    f"{message.content.splitlines()[0]} …以下略"
+                    if "\n" in message.content
+                    else (
+                        f"{message.content[:25]} …以下略"
+                        if len(message.content) > 30
+                        else message.content
+                        if message.content != ""
+                        else "(No Text)"
+                    )
+                )
 
                 container.add_item(ui.Section(
                     f"> {content}",
@@ -145,13 +152,9 @@ class ReactionList:
         container.add_item(buttons)
 
         view.add_item(container)
-        return view
+        print("[ReactionList] view created")
 
-    async def message_edit(self):
-        """最新の情報に更新します"""
-        await self.response_message.edit(
-            view=await self.create_view()
-        )
+        return view
 
     class EmojiSelect(ui.Select):
         def __init__(self, parent_class: "ReactionList"):
@@ -159,7 +162,7 @@ class ReactionList:
 
             options = [
                 SelectOption(label=display, value=value)
-                for display, value in emoji_map
+                for display, value in emoji_map.items()
             ]
 
             super().__init__(
@@ -173,7 +176,9 @@ class ReactionList:
             self.parent_class.get_message_ids(reaction)
 
             self.parent_class.page = 0
-            await self.parent_class.message_edit()
+            await interaction.response.edit_message(
+                view=await self.parent_class.create_view()
+            )
 
     class FirstPageButton(ui.Button): # 一番最初へ
         def __init__(self, parent_class: "ReactionList"):
@@ -187,7 +192,9 @@ class ReactionList:
 
         async def callback(self, interaction: Interaction):
             self.parent_class.page = 0
-            await self.parent_class.message_edit()
+            await interaction.response.edit_message(
+                view=await self.parent_class.create_view()
+            )
 
     class PreviousPageButton(ui.Button): # 一つ前へ
         def __init__(self, parent_class: "ReactionList"):
@@ -201,7 +208,9 @@ class ReactionList:
 
         async def callback(self, interaction: Interaction):
             self.parent_class.page -= 1
-            await self.parent_class.message_edit()
+            await interaction.response.edit_message(
+                view=await self.parent_class.create_view()
+            )
 
     class NowPage(ui.Button):
         def __init__(self, parent_class: "ReactionList"):
@@ -225,7 +234,9 @@ class ReactionList:
 
         async def callback(self, interaction: Interaction):
             self.parent_class.page += 1
-            await self.parent_class.message_edit()
+            await interaction.response.edit_message(
+                view=await self.parent_class.create_view()
+            )
 
     class LastPageButton(ui.Button):
         def __init__(self, parent_class: "ReactionList"):
@@ -239,7 +250,9 @@ class ReactionList:
 
         async def callback(self, interaction: Interaction):
             self.parent_class.page = self.parent_class.get_page_count() - 1
-            await self.parent_class.message_edit()
+            await interaction.response.edit_message(
+                view=await self.parent_class.create_view()
+            )
 
 @fiestar_group.command(
     name="reactions",

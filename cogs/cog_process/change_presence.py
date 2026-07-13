@@ -89,6 +89,24 @@ class ChangeStatus(commands.Cog):
             "Extratone",
         ]
 
+        """
+            # この14行が1周みたいなもん
+
+            (CustomActivity, "", 10.0),
+            (CustomActivity, "", 30.0),
+            (CustomActivity, music, 20.0),
+            (CustomActivity, ping, 5.0),
+            (CustomActivity, ping, 5.0),
+            (CustomActivity, "", 30.0),
+            (CustomActivity, music, 20.0),
+            (CustomActivity, "", 10.0),
+            (CustomActivity, "", 30.0),
+            (CustomActivity, music, 20.0),
+            (CustomActivity, music, 20.0),
+            (CustomActivity, "", 20.0),
+            (CustomActivity, "", 30.0),
+            (CustomActivity, music, 20.0),
+        """
         self.activities = [
             (CustomActivity, "キャッシュを確認中", 10.0),
             (CustomActivity, "プログラミングを勉強中", 30.0),
@@ -101,17 +119,25 @@ class ChangeStatus(commands.Cog):
             (CustomActivity, "アプリを開発中", 30.0),
             (CustomActivity, music, 20.0),
             (CustomActivity, music, 20.0),
-            (CustomActivity, "画面の前の君の顔を視聴中", 10.0),
+            (CustomActivity, "画面の前の君の顔を視聴中", 20.0),
             (CustomActivity, "おれおを飲食中", 30.0),
             (CustomActivity, music, 20.0),
+            # 1周
             (CustomActivity, "仮想環境でテストが面倒な為本番環境でテスト中", 10.0),
             (CustomActivity, "エズにかまちょ中", 30.0),
             (CustomActivity, music, 20.0),
             (CustomActivity, ping, 5.0),
             (CustomActivity, ping, 5.0),
+            (CustomActivity, "DIY中", 30.0),
+            (CustomActivity, music, 20.0),
+            (CustomActivity, "軽く休憩中", 10.0),
             (CustomActivity, "雑談中", 30.0),
             (CustomActivity, music, 20.0),
             (CustomActivity, music, 20.0),
+            (CustomActivity, "調理中", 20.0),
+            (CustomActivity, "焦げすぎて滅", 30.0),
+            (CustomActivity, music, 20.0),
+            # 2周
         ]
 
         self.task = bot.loop.create_task(self.change_presence())
@@ -148,11 +174,11 @@ class ChangeStatus(commands.Cog):
                 raise
 
             except HTTPException as e:
-                print(f"通信エラー:\n{e}")
+                print(f"[ChangeStatus] 通信エラー:\n{e}")
                 await asyncio.sleep(60)
 
             except Exception as e:
-                print(f"エラー:\n{e}")
+                print(f"[ChangeStatus] エラー:\n{e}")
                 await asyncio.sleep(30)
 
 

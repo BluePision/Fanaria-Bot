@@ -1,8 +1,7 @@
 # Fanaria-Bot
 Fanaria Official Botのリポジトリ
 
-Discord雑談サーバー [💫 𝔽𝕒𝕟𝕒𝕣𝕚𝕒](https://discord.gg/kftr8cMfED) の公式Botのソースコードです  
-envやその他重要なファイルは含めてないはずです
+Discord雑談サーバー [💫 𝔽𝕒𝕟𝕒𝕣𝕚𝕒](https://discord.gg/kftr8cMfED) の公式Botのソースコードです
 
 プルリクエストは自由にしてください
 
@@ -24,4 +23,12 @@ envやその他重要なファイルは含めてないはずです
 
 - コマンドは同系統のコマンドをGroupコマンド（`discord.app_commands.Group`）としてまとめて登録する
 
+- コマンドに限らず全機能はFanaria内でのみ使用できるように徹底する
+
 - 基本的にIDや各種設定値は`bot/Configs/`内で管理する
+
+- 所々に遊びを含めて楽しませる
+
+- このBotからすると管理者達はおもちゃです
+
+- 音楽、特にEDMを好むBotです

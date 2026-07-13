@@ -1,4 +1,4 @@
-from . import _com_avater, _com_banner
+from . import _com_predict_janken
 
 from discord import Object
 from discord.ext import commands

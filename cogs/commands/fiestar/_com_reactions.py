@@ -157,6 +157,12 @@ class ReactionList:
 
         container.add_item(buttons)
 
+        container.add_item(ui.Separator(spacing=components.SeparatorSpacing.large))
+        container.add_item(ui.TextDisplay(
+            "-# データベースから取得しています\n"
+            "-# リアクションしたのにない場合は登録されていない可能性がありますので、Botが起動している時にその投稿にリアクションをしてください"
+        ))
+
         view.add_item(container)
 
         return view

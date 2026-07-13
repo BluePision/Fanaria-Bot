@@ -154,6 +154,7 @@ class ChangeStatus(commands.Cog):
         return f"{genre}を再生中"
 
     async def change_presence(self) -> None:
+        await asyncio.sleep(5)
         await self.bot.wait_until_ready()
 
         index = 0

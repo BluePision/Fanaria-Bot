@@ -1,6 +1,6 @@
 import asyncio
 import random
-from discord import CustomActivity, HTTPException
+from discord import CustomActivity, Game, HTTPException
 from discord.ext import commands
 
 class ChangeStatus(commands.Cog):
@@ -92,51 +92,51 @@ class ChangeStatus(commands.Cog):
         """
             # この14行が1周みたいなもん
 
-            (CustomActivity, "", 10.0),
-            (CustomActivity, "", 30.0),
-            (CustomActivity, music, 20.0),
-            (CustomActivity, ping, 5.0),
-            (CustomActivity, ping, 5.0),
-            (CustomActivity, "", 30.0),
-            (CustomActivity, music, 20.0),
-            (CustomActivity, "", 10.0),
-            (CustomActivity, "", 30.0),
-            (CustomActivity, music, 20.0),
-            (CustomActivity, music, 20.0),
-            (CustomActivity, "", 20.0),
-            (CustomActivity, "", 30.0),
-            (CustomActivity, music, 20.0),
+            (lambda text: CustomActivity(name=text), "", 10.0),
+            (lambda text: CustomActivity(name=text), "", 30.0),
+            (lambda text: CustomActivity(name=text), music, 20.0),
+            (lambda text: CustomActivity(name=text), ping, 5.0),
+            (lambda text: CustomActivity(name=text), ping, 5.0),
+            (lambda text: CustomActivity(name=text), "", 30.0),
+            (lambda text: CustomActivity(name=text), music, 20.0),
+            (lambda text: CustomActivity(name=text), "", 10.0),
+            (lambda text: CustomActivity(name=text), "", 30.0),
+            (lambda text: CustomActivity(name=text), music, 20.0),
+            (lambda text: CustomActivity(name=text), music, 20.0),
+            (lambda text: CustomActivity(name=text), "", 20.0),
+            (lambda text: CustomActivity(name=text), "", 30.0),
+            (lambda text: CustomActivity(name=text), music, 20.0),
         """
         self.activities = [
-            (CustomActivity, "キャッシュを確認中", 10.0),
-            (CustomActivity, "プログラミングを勉強中", 30.0),
-            (CustomActivity, music, 20.0),
-            (CustomActivity, ping, 5.0),
-            (CustomActivity, ping, 5.0),
-            (CustomActivity, "雑談中", 30.0),
-            (CustomActivity, music, 20.0),
-            (CustomActivity, "てぃを叩き起こし中", 10.0),
-            (CustomActivity, "アプリを開発中", 30.0),
-            (CustomActivity, music, 20.0),
-            (CustomActivity, music, 20.0),
-            (CustomActivity, "画面の前の君の顔を視聴中", 20.0),
-            (CustomActivity, "おれおを飲食中", 30.0),
-            (CustomActivity, music, 20.0),
+            (lambda text: CustomActivity(name=text), "キャッシュを確認中", 10.0),
+            (lambda text: CustomActivity(name=text), "プログラミングを勉強中", 30.0),
+            (lambda text: CustomActivity(name=text), music, 20.0),
+            (lambda text: CustomActivity(name=text), ping, 5.0),
+            (lambda text: CustomActivity(name=text), ping, 5.0),
+            (lambda text: CustomActivity(name=text), "雑談中", 30.0),
+            (lambda text: CustomActivity(name=text), music, 20.0),
+            (lambda text: CustomActivity(name=text), "てぃを叩き起こし中", 10.0),
+            (lambda text: CustomActivity(name=text), "アプリを開発中", 30.0),
+            (lambda text: CustomActivity(name=text), music, 20.0),
+            (lambda text: CustomActivity(name=text), music, 20.0),
+            (lambda text: CustomActivity(name=text), "画面の前の君の顔を視聴中", 20.0),
+            (lambda text: CustomActivity(name=text), "おれおを飲食中", 30.0),
+            (lambda text: CustomActivity(name=text), music, 20.0),
             # 1周
-            (CustomActivity, "仮想環境でテストが面倒な為本番環境でテスト中", 10.0),
-            (CustomActivity, "エズにかまちょ中", 30.0),
-            (CustomActivity, music, 20.0),
-            (CustomActivity, ping, 5.0),
-            (CustomActivity, ping, 5.0),
-            (CustomActivity, "DIY中", 30.0),
-            (CustomActivity, music, 20.0),
-            (CustomActivity, "軽く休憩中", 10.0),
-            (CustomActivity, "雑談中", 30.0),
-            (CustomActivity, music, 20.0),
-            (CustomActivity, music, 20.0),
-            (CustomActivity, "調理中", 20.0),
-            (CustomActivity, "焦げすぎて滅", 30.0),
-            (CustomActivity, music, 20.0),
+            (lambda text: CustomActivity(name=text), "仮想環境でテストが面倒な為本番環境でテスト中", 10.0),
+            (lambda text: CustomActivity(name=text), "エズにかまちょ中", 30.0),
+            (lambda text: CustomActivity(name=text), music, 20.0),
+            (lambda text: CustomActivity(name=text), ping, 5.0),
+            (lambda text: CustomActivity(name=text), ping, 5.0),
+            (lambda text: CustomActivity(name=text), "DIY中", 30.0),
+            (lambda text: CustomActivity(name=text), music, 20.0),
+            (lambda text: CustomActivity(name=text), "軽く休憩中", 10.0),
+            (lambda text: CustomActivity(name=text), "雑談中", 30.0),
+            (lambda text: CustomActivity(name=text), music, 20.0),
+            (lambda text: CustomActivity(name=text), music, 20.0),
+            (lambda text: CustomActivity(name=text), "調理中", 20.0),
+            (lambda text: CustomActivity(name=text), "焦げすぎて滅", 30.0),
+            (lambda text: CustomActivity(name=text), music, 20.0),
             # 2周
         ]
 
@@ -160,11 +160,13 @@ class ChangeStatus(commands.Cog):
 
         while not self.bot.is_closed():
             try:
-                activity_class, content, sleep_time = self.activities[index]
+                activity_factory, content, sleep_time = self.activities[index]
 
                 text = content() if callable(content) else content
 
-                await self.bot.change_presence(activity=activity_class(name=text))
+                await self.bot.change_presence(
+                    activity=activity_factory(text)
+                )
 
                 await asyncio.sleep(sleep_time)
 

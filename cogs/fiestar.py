@@ -113,6 +113,40 @@ class Fiestar(commands.Cog):
         if reaction_type is None:
             return
 
+        if reaction_type == "bookmark":
+            message = discord.utils.get(
+                self.bot.cached_messages,
+                id=payload.message_id
+            )
+            if message is None:
+                try:
+                    message = await channel.fetch_message(payload.message_id)
+
+                except discord.NotFound:
+                    return
+
+            await message.remove_reaction(payload.emoji, user)
+
+            if not self.database.has_reaction(
+                payload.user_id,
+                reaction_type,
+                payload.message_id
+            ):
+                self.database.add_reaction(
+                    payload.user_id,
+                    reaction_type,
+                    payload.message_id
+                )
+
+            else:
+                self.database.remove_reaction(
+                    payload.user_id,
+                    reaction_type,
+                    payload.message_id
+                )
+
+            return
+
         if not self.database.has_reaction(
             payload.user_id,
             reaction_type,
@@ -181,6 +215,9 @@ class Fiestar(commands.Cog):
 
         reaction_type = emoji_map.get(emoji)
         if reaction_type is None:
+            return
+
+        if reaction_type == "bookmark":
             return
 
         self.database.remove_reaction(

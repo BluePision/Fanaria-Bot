@@ -105,11 +105,11 @@ class ReactionList:
         if messages:
             for message in messages:
 
-                content = re.sub(
+                content = utils.escape_markdown(re.sub(
                     r"<a?:[A-Za-z0-9_]+:\d+>|:[A-Za-z0-9_]+:",
                     "[emoji]",
-                    utils.escape_markdown(message.content)
-                )
+                    message.content
+                ))
 
                 content = (
                     f"{content.splitlines()[0]} …以下略"

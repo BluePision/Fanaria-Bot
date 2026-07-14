@@ -12,7 +12,7 @@ from typing import Optional, List
 from dotenv import load_dotenv
 
 from cogs import BotLog, UpdateInfo
-from configs.main import OwnerGuildID
+from configs.main import OwnerGuildID, Owner_IDs
 
 
 BASE_DIR = Path(__file__).resolve().parent
@@ -25,11 +25,7 @@ if not TOKEN:
 bot = commands.Bot(
     command_prefix=["f!", "fa!", "fanaria!"],
     intents=discord.Intents.all(),
-    owner_ids=[
-        1102936594362671235,
-        1333027499302453273,
-        377029059886055424
-    ]
+    owner_ids=Owner_IDs
 )
 
 # フラグ: on_ready の一度だけ実行用
@@ -134,8 +130,14 @@ async def load_cogs(base_path: str = "cogs") -> int:
     loaded = 0
 
     for py in base.rglob("*.py"):
+        relative = py.relative_to(base)
+
+        if any(part.startswith("_") for part in relative.parts):
+            continue
+
         if py.name.startswith("_"):
             continue
+
         # cogs/foo/bar.py -> cogs.foo.bar
         module_path = ".".join(py.with_suffix("").parts)
         # Windows の場合パスにドライブ名が入ることがあるので cogs 以降を切り出す

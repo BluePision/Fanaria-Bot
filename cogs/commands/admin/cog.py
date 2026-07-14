@@ -1,5 +1,6 @@
-from . import _com_send_message
-from .moderation import _group, _com_ban, _com_kick, _com_timeout
+from ._sub_commands import cmd_send_message
+from .moderation._sub_commands import cmd_ban, cmd_kick, cmd_timeout
+from .moderation import _group
 
 from discord import Object
 from discord.ext import commands

@@ -49,6 +49,10 @@ class JihouCog(commands.Cog):
         except ValueError:
             return
 
+        # 1/6の確率で進むようにする
+        if random.randint(1, 6) != 1:
+            return
+
         # ユーザーをランダムに選ぶ
         jihou_user = self.jihou.choice_user(time)
         user = self.bot.get_user(jihou_user.id)

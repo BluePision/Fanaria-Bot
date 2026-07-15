@@ -167,21 +167,24 @@ async def load_cogs(base_path: str = "cogs") -> int:
 
 def count_commands(commands: list[AppCommand]) -> int:
     def count_options(
-        options: list[Argument | AppCommandGroup]
+        options: list[Argument | AppCommandGroup],
+        group_count: int = 1
     ) -> int:
         count = 0
+
+        line = "┃" * group_count
 
         for option in options:
             if isinstance(option, Argument):
                 continue
 
             if option.type is AppCommandOptionType.subcommand:
-                print(f"┃+1 subcommand: {option.name}")
+                print(f"{line}+1 subcommand: {option.name}")
                 count += 1
 
             elif option.type is AppCommandOptionType.subcommand_group:
-                print(f"┏subcommand_group: {option.name}")
-                count += count_options(option.options)
+                print(f"{line}┏subcommand_group: {option.name}")
+                count += count_options(option.options, group_count=group_count + 1)
 
         return count
 
@@ -200,7 +203,7 @@ def count_commands(commands: list[AppCommand]) -> int:
 
         print(f"┏command_group: {command.name}")
 
-        count += count_options(command.options)
+        count += count_options(command.options, group_count=1)
 
     return count
 

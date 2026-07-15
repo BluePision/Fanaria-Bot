@@ -176,11 +176,11 @@ def count_commands(commands: list[AppCommand]) -> int:
                 continue
 
             if option.type is AppCommandOptionType.subcommand:
-                print(f"+1 subcommand: {option.name}")
+                print(f"┃+1 subcommand: {option.name}")
                 count += 1
 
             elif option.type is AppCommandOptionType.subcommand_group:
-                print(f"subcommand_group: {option.name}")
+                print(f"┏subcommand_group: {option.name}")
                 count += count_options(option.options)
 
         return count
@@ -188,8 +188,6 @@ def count_commands(commands: list[AppCommand]) -> int:
     count = 0
 
     for command in commands:
-        print(f"+command: {command.name}")
-
         if not command.options:
             print(f"+1 command: {command.name}")
             count += 1
@@ -199,6 +197,8 @@ def count_commands(commands: list[AppCommand]) -> int:
             print(f"+1 command: {command.name}")
             count += 1
             continue
+
+        print(f"┏command_group: {command.name}")
 
         count += count_options(command.options)
 

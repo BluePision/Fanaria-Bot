@@ -1,6 +1,7 @@
 import discord
 import os
 import io
+import sys
 import signal
 import asyncio
 import traceback
@@ -20,15 +21,16 @@ BASE_DIR = Path(__file__).resolve().parent
 load_dotenv()
 TOKEN = os.environ.get("TOKEN")
 if not TOKEN:
-    raise RuntimeError("TOKEN が設定されていません。環境変数を確認してください。")
+    raise RuntimeError("TOKEN が見つかりませんでした")
 
+# botの定義
 bot = commands.Bot(
     command_prefix=["f!", "fa!", "fanaria!"],
     intents=discord.Intents.all(),
     owner_ids=Owner_IDs
 )
 
-# フラグ: on_ready の一度だけ実行用
+# 既に起動準備を終えているかどうか
 _ready_handled = False
 
 botlog: Optional[BotLog] = None
@@ -57,10 +59,6 @@ async def graceful_shutdown():
 
         except Exception as e:
             print(f"{ext_name} のアンロードに失敗:\n{e}")
-
-    # 必要ならここで状態保存や DB 切断などを行う
-    # await save_state()
-    # await db.close()
 
     try:
         await bot.close()
@@ -109,13 +107,13 @@ async def load_core_botlog():
             print("BotLog Cog が見つかりません")
             return
 
-        # 初期化
+        # BotLogを初期化
         try:
             await botlog.initialize()
-            print("BotLog を初期化しました")
+            print("BotLogを初期化しました")
 
         except Exception as e:
-            print(f"BotLog の初期化に失敗: {e}")
+            print(f"BotLogの初期化に失敗: {e}")
 
     except Exception as e:
         print(f"{CORE_BOTLOG_MODULE} のロードに失敗: {e}")
@@ -270,6 +268,38 @@ async def on_ready():
         activity=discord.CustomActivity(name="起動しました")
     )
 
+async def send_error_log(name: str, error: Exception):
+    global botlog
+
+    error_text = "".join(traceback.format_exception(type(error), error, error.__traceback__))
+
+    print(f"[{name}]\n\n{error_text}")
+
+    view = discord.ui.LayoutView(timeout=None)
+    container = discord.ui.Container(accent_color=discord.Color.red())
+
+    content = f"# [{name}]\n\n```{error_text}```"
+
+    try:
+        container.add_item(discord.ui.TextDisplay(content))
+        view.add_item(container)
+
+        await botlog.send(layoutview=view)
+        return
+
+    except Exception:
+        pass
+
+    file = discord.File(
+        fp=io.BytesIO(error_text.encode("utf-8")),
+        filename=f"error_{name}.txt"
+    )
+
+    await botlog.send(
+        content=f"[{name}]",
+        file=file
+    )
+
 async def send_command_error(interaction: discord.Interaction, error_message: str):
     try:
         if not interaction.response.is_done():
@@ -292,37 +322,17 @@ async def on_app_command_error(interaction: discord.Interaction, error: app_comm
         await send_command_error(interaction, "このコマンドを実行する権限がありません。必要な権限を持っているか確認してください。")
         return
 
+    if isinstance(error, app_commands.CommandInvokeError):
+        error = error.original
+
+    await send_error_log("on_app_command_error", error)
+
 @bot.event
 async def on_error(event, *args, **kwargs):
-    global botlog
+    exc_type, exc, tb = sys.exc_info()
 
-    error_text = traceback.format_exc()
-    print(f"[on_error] {event}\n\n{error_text}")
-
-    view = discord.ui.LayoutView(timeout=None)
-    container = discord.ui.Container(accent_color=discord.Color.red())
-
-    content = f"# [on_error] {event}\n\n```{error_text}```"
-
-    try:
-        container.add_item(discord.ui.TextDisplay(content))
-        view.add_item(container)
-
-        await botlog.send(layoutview=view)
-        return
-
-    except Exception:
-        pass
-
-    file = discord.File(
-        fp=io.BytesIO(error_text.encode("utf-8")),
-        filename=f"error_{event}.txt"
-    )
-
-    await botlog.send(
-        content=f"[on_error] {event}（ログはファイル）",
-        file=file
-    )
+    if exc:
+        await send_error_log("on_error " + event, exc)
 
 if __name__ == "__main__":
     try:

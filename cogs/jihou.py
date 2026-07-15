@@ -49,8 +49,8 @@ class JihouCog(commands.Cog):
         except ValueError:
             return
 
-        # 1/6の確率で進むようにする
-        if random.randint(1, 6) != 1:
+        # 1/9の確率で進むようにする
+        if random.randint(1, 9) != 1:
             return
 
         # ユーザーをランダムに選ぶ

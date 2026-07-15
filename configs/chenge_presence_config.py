@@ -1,4 +1,9 @@
+import random
+from dataclasses import dataclass, field
+from typing import Optional
 from discord import CustomActivity
+from discord.ext import commands
+
 
 Edm_Music_Genres = [
     "Hardcore",
@@ -147,9 +152,62 @@ def get_activities(music, ping) -> list[tuple]:
         (lambda text: CustomActivity(name=text), music, 20.0),
     ]
 
+
+# 殆ど諦め中 むずい
+
+@dataclass
+class Activity:
+    """
+    1つのアクティビティを定義するクラス
+
+    Args:
+        activity (CustomActivity): アクティビティそのもの
+        sleep_time (float): 待機時間・そのアクティビティを表示する時間
+        text (Optional[str]): 実際のテキスト
+    """
+
+    activity: CustomActivity
+    sleep_time: float
+    text: Optional[str]
+
+@dataclass
+class Activities:
+    """
+
+    Args:
+        activity_list (list[Activity]): アクティビティのリスト
+        weight (float): 重み。値が大きければ大きいほど選ばれやすくなるようにする
+    """
+
+    activity_list: list[Activity]
+    weight: float
+
 class ChengeActivity:
     """
     もしかしたら作るかもしれないクラス
 
     思いついたら作る
     """
+    def __init__(self, bot: commands.Bot):
+        self.bot = bot
+
+        self.music = lambda: self._get_music_genre_text()
+        self.ping = lambda: self._get_latency_text()
+
+    def _get_latency_text(self) -> str:
+        latency = round(self.bot.latency * 1000)
+        return f"Ping値は{latency}ms" if latency >= 0 else "Ping値 Error"
+
+    def _get_music_genre_text(self) -> str:
+        genre = random.choice(Edm_Music_Genres)
+        return f"{genre}を再生中"
+
+ActivitiesList = [
+    Activities(
+        activity_list=[
+            Activity(activity=lambda: CustomActivity(name="キャッシュを確認中"), sleep_time=10.0, text="キャッシュを確認中"),
+            Activity(activity=lambda: CustomActivity(name=ChengeActivity.ping), sleep_time=5.0)
+        ],
+        weight=50.0
+    )
+]

@@ -23,6 +23,7 @@ class JihouCog(commands.Cog):
         self.jihou = Jihou(bot, JihouWebhookURL)
 
         self._last_sent: str | None = None
+        self._last_weight_failed: str | None = None
 
         self.loop.start()
 
@@ -39,14 +40,23 @@ class JihouCog(commands.Cog):
         if self._last_sent == key:
             return
 
+        # この時間は送信しないとなっている場合は戻る
+        if self._last_weight_failed == key:
+            return
+
         # 何時何分の形にする
         current = now.strftime("%H:%M")
 
         # その時間が存在するか確認し、JihouTimeを受け取る
         try:
-            time = JihouTime(current)
+            jihoutime = JihouTime.from_time(current)
 
         except ValueError:
+            return
+
+        # 時報を送信するかどうかを、時報の時間にそれぞれ定められている重みによって決定する
+        if self.jihou.should_send_jihou(jihoutime) is False:
+            self._last_weight_failed = key
             return
 
         # 1/9の確率で進むようにする
@@ -54,13 +64,13 @@ class JihouCog(commands.Cog):
             return
 
         # ユーザーをランダムに選ぶ
-        jihou_user = self.jihou.choice_user(time)
+        jihou_user = self.jihou.choice_user(jihoutime)
         user = self.bot.get_user(jihou_user.id)
         if user is None:
             user = await self.bot.fetch_user(jihou_user.id)
 
         # そのユーザーのメッセージリストを取得する
-        messages = jihou_user.get_messages(time)
+        messages = jihou_user.get_messages(jihoutime)
         if not messages:
             return
 

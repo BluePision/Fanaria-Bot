@@ -16,13 +16,24 @@ class JihouTime(Enum):
         midnight: 02:30
     """
 
-    morning = "07:00"
-    noon = "12:00"
-    night = "22:45"
-    midnight = "02:30"
+    morning = ("07:00", 70.0)
+    noon = ("12:00", 40.0)
+    night = ("22:45", 60.0)
+    midnight = ("02:30", 50.0)
+
+    def __init__(self, time: str, weight: float):
+        self.time = time
+        self.weight = weight
 
     def __str__(self) -> str:
-        return self.value
+        return self.time
+
+    @classmethod
+    def from_time(cls, time: str) -> "JihouTime":
+        for t in cls:
+            if t.time == time:
+                return t
+        raise ValueError
 
 @dataclass
 class JihouUser:
@@ -78,6 +89,10 @@ class Jihou:
             client=bot
         )
 
+    def should_send_jihou(self, jihou_time: JihouTime) -> bool:
+        """この時間で送信するかどうかをランダムに決定する"""
+        return random.random() * 100 < jihou_time.weight
+
     def choice_user(
             self,
             time: str | JihouTime | None = None
@@ -93,7 +108,7 @@ class Jihou:
         else:
             if isinstance(time, str):
                 try:
-                    time = JihouTime(time)
+                    time = JihouTime.from_time(time)
 
                 except ValueError:
                     raise ValueError(f"{time} が存在しません")
@@ -121,6 +136,7 @@ class Jihou:
             *,
             wait: bool = False
     ) -> Optional[WebhookMessage]:
+        """時報を送信する"""
         if wait:
             return await self.webhook.send(
                 content = content,
@@ -135,6 +151,7 @@ class Jihou:
                 avatar_url = avatar_url
             )
             return
+
 
 JihouData = [
     JihouUser( # てぃ

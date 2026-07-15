@@ -1,4 +1,4 @@
-from . import _com_predict_janken
+from ._sub_commands import cmd_predict_janken, cmd_self_timeout
 
 from discord import Object
 from discord.ext import commands

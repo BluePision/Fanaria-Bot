@@ -1,5 +1,5 @@
 from discord import app_commands, Interaction, Member, User, Embed, Color
-from ._group import user_group
+from .._group import user_group
 
 @user_group.command(
     name="banner",

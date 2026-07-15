@@ -1,9 +1,7 @@
-import asyncio
 import random
-from discord import app_commands, Interaction, User, Member, Embed, Color, NotFound
-from typing import Optional
+from discord import app_commands, Interaction, User, Embed, Color
 
-from ._group import tool_group
+from .._group import tool_group
 
 
 hands = {

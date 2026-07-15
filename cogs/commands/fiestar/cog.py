@@ -1,4 +1,4 @@
-from . import _com_reactions
+from ._sub_commands import cmd_reactions
 
 from discord import Object
 from discord.ext import commands

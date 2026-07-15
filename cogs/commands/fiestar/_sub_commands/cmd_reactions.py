@@ -5,8 +5,8 @@ from typing import Optional, List
 import traceback
 import re
 
-from ._group import fiestar_group
-from ._process_db_connect import fiestar_database
+from .._group import fiestar_group
+from .._process_db_connect import fiestar_database
 
 from configs.main import OwnerGuildID, FiestarChannelID
 from configs.fiestar_config import emoji_map

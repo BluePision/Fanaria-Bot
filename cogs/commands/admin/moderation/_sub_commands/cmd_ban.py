@@ -1,7 +1,7 @@
 from discord import app_commands, Interaction, Member, Embed, Color
 from typing import Optional
 
-from ...moderation._group import moderation_group
+from .._group import moderation_group
 from ._check import check_not_mod_permission
 
 

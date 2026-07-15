@@ -3,7 +3,7 @@ from discord import app_commands, Interaction, Member, Embed, Color, NotFound
 from typing import Optional
 
 from cogs import BotLog
-from ...admin._group import admin_group
+from .._group import admin_group
 
 
 @admin_group.command(

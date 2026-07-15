@@ -1,4 +1,4 @@
-from . import _com_avater, _com_banner
+from ._sub_commands import cmd_avater, cmd_banner
 
 from discord import Object
 from discord.ext import commands

@@ -2,7 +2,7 @@ from discord import app_commands, Interaction, Member, User, Embed, Color
 from .._group import user_group
 
 @user_group.command(
-    name="avatar_icon",
+    name="avatar",
     description="ユーザーのアイコンを表示"
 )
 @app_commands.describe(

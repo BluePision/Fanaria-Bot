@@ -1,7 +1,7 @@
 import random
 from dataclasses import dataclass, field
 from typing import Optional
-from discord import CustomActivity
+from discord import CustomActivity, Game, Activity, ActivityType
 from discord.ext import commands
 
 
@@ -156,7 +156,7 @@ def get_activities(music, ping) -> list[tuple]:
 # 殆ど諦め中 むずい
 
 @dataclass
-class Activity:
+class PresenceActivity:
     """
     1つのアクティビティを定義するクラス
 
@@ -175,11 +175,11 @@ class Activities:
     """
 
     Args:
-        activity_list (list[Activity]): アクティビティのリスト
+        activity_list (list[PresenceActivity]): アクティビティのリスト
         weight (float): 重み。値が大きければ大きいほど選ばれやすくなるようにする
     """
 
-    activity_list: list[Activity]
+    activity_list: list[PresenceActivity]
     weight: float
 
 class ChengeActivity:
@@ -205,8 +205,9 @@ class ChengeActivity:
 ActivitiesList = [
     Activities(
         activity_list=[
-            Activity(activity=lambda: CustomActivity(name="キャッシュを確認中"), sleep_time=10.0, text="キャッシュを確認中"),
-            Activity(activity=lambda: CustomActivity(name=ChengeActivity.ping), sleep_time=5.0)
+            PresenceActivity(activity=lambda: CustomActivity(name="キャッシュを確認中"), sleep_time=10.0, text="キャッシュを確認中"),
+            PresenceActivity(activity=lambda: CustomActivity(name=ChengeActivity.ping), sleep_time=5.0),
+            PresenceActivity(activity=lambda: Activity(type=ActivityType.custom), sleep_time=5.0)
         ],
         weight=50.0
     )

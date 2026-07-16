@@ -154,17 +154,17 @@ def get_activities(music, ping) -> list[tuple]:
 
 
 # 殆ど諦め中 むずい
-
+"""
 @dataclass
 class PresenceActivity:
-    """
+    \"""
     1つのアクティビティを定義するクラス
 
     Args:
         activity (CustomActivity): アクティビティそのもの
         sleep_time (float): 待機時間・そのアクティビティを表示する時間
         text (Optional[str]): 実際のテキスト
-    """
+    \"""
 
     activity: CustomActivity
     sleep_time: float
@@ -172,22 +172,22 @@ class PresenceActivity:
 
 @dataclass
 class Activities:
-    """
+    \"""
 
     Args:
         activity_list (list[PresenceActivity]): アクティビティのリスト
         weight (float): 重み。値が大きければ大きいほど選ばれやすくなるようにする
-    """
+    \"""
 
     activity_list: list[PresenceActivity]
     weight: float
 
 class ChengeActivity:
-    """
+    \"""
     もしかしたら作るかもしれないクラス
 
     思いついたら作る
-    """
+    \"""
     def __init__(self, bot: commands.Bot):
         self.bot = bot
 
@@ -212,3 +212,4 @@ ActivitiesList = [
         weight=50.0
     )
 ]
+"""

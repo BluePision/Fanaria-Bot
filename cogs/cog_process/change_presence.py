@@ -3,7 +3,7 @@ import random
 from discord import CustomActivity, Game, HTTPException
 from discord.ext import commands
 
-from configs.chenge_presence_config import Edm_Music_Genres, get_activities
+from configs.change_presence_config import Edm_Music_Genres, get_activities
 
 
 class ChangeStatus(commands.Cog):

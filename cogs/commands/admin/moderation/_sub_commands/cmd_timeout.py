@@ -35,7 +35,7 @@ from ._check import check_not_mod_permission
         app_commands.Choice(name="15日", value=1296000),
         app_commands.Choice(name="20日", value=1728000),
         app_commands.Choice(name="25日", value=2160000),
-        app_commands.Choice(name="約28日", value=2419000),
+        app_commands.Choice(name="約28日", value=2419000), # 実際は2419200まで指定できる仕様だが、Discordとのタイムラグによってエラーになるのを防ぐためわざと200秒減らしている
     ]
 )
 @app_commands.checks.has_permissions(administrator=True)
@@ -84,3 +84,17 @@ async def timeout(
 
     except Exception as e:
         print(f"timeout Error: {e}")
+        await interaction.response.send_message(
+            embed=(
+                Embed(
+                    description=f"{user.mention} のタイムアウトに失敗しました。",
+                    color=Color.yellow()
+                )
+                .add_field(
+                    name="理由",
+                    value=f"```{e}```" if e else "不明",
+                    inline=True
+                )
+            ),
+            ephemeral=True
+        )

@@ -66,7 +66,7 @@ class UpdateInfo(commands.Cog):
         await self.update()
 
         # 起動ログを BotLog に送る
-        botlog: "BotLog" | None = self.bot.get_cog("BotLog")
+        botlog: Optional["BotLog"] = self.bot.get_cog("BotLog")
         try:
             await botlog.send(embed=Embed(
                 title="UpdateInfo",

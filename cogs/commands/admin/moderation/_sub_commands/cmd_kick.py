@@ -45,3 +45,17 @@ async def kick(
 
     except Exception as e:
         print(f"kick Error: {e}")
+        await interaction.response.send_message(
+            embed=(
+                Embed(
+                    description=f"{user.mention} のキックに失敗しました。",
+                    color=Color.yellow()
+                )
+                .add_field(
+                    name="理由",
+                    value=f"```{e}```" if e else "不明",
+                    inline=True
+                )
+            ),
+            ephemeral=True
+        )

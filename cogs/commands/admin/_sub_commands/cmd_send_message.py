@@ -65,20 +65,21 @@ async def send_message(
     await interaction.followup.send("メッセージを送信しました", ephemeral=True)
 
     botlog: Optional[BotLog] = interaction.client.get_cog("BotLog")
-    await botlog.send(embed=(
-        Embed(
-            title="SendMessage",
-            description=message,
-            color=Color.blue()
-        )
-        .add_field(
-            name="送信者",
-            value=interaction.user.mention,
-            inline=True
-        )
-        .add_field(
-            name="メッセージ",
-            value=sent_message.jump_url,
-            inline=True
-        )
-    ))
+    if botlog is not None:
+        await botlog.send(embed=(
+            Embed(
+                title="SendMessage",
+                description=message,
+                color=Color.blue()
+            )
+            .add_field(
+                name="送信者",
+                value=interaction.user.mention,
+                inline=True
+            )
+            .add_field(
+                name="メッセージ",
+                value=sent_message.jump_url,
+                inline=True
+            )
+        ))

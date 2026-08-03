@@ -74,3 +74,17 @@ async def ban(
 
     except Exception as e:
         print(f"ban Error: {e}")
+        await interaction.response.send_message(
+            embed=(
+                Embed(
+                    description=f"{user.mention} のBANに失敗しました。",
+                    color=Color.yellow()
+                )
+                .add_field(
+                    name="理由",
+                    value=f"```{e}```" if e else "不明",
+                    inline=True
+                )
+            ),
+            ephemeral=True
+        )

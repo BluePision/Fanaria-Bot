@@ -123,7 +123,7 @@ async def load_cogs(base_path: str = "cogs") -> int:
     base = BASE_DIR / base_path
     if not base.exists():
         print(f"{base_path} が見つかりません。")
-        return
+        return 0
 
     loaded = 0
 

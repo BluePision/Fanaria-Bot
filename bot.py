@@ -278,7 +278,9 @@ async def send_error_log(name: str, error: Exception):
     view = discord.ui.LayoutView(timeout=None)
     container = discord.ui.Container(accent_color=discord.Color.red())
 
-    content = f"# [{name}]\n\n```{error_text}```"
+    container.add_item(discord.ui.TextDisplay(f"# [{name}]"))
+
+    content = f"```{error_text}```"
 
     try:
         container.add_item(discord.ui.TextDisplay(content))
@@ -297,7 +299,7 @@ async def send_error_log(name: str, error: Exception):
 
     await botlog.send(
         content=f"[{name}]",
-        file=file
+        files=[file]
     )
 
 async def send_command_error(interaction: discord.Interaction, error_message: str):

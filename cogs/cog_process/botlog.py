@@ -1,3 +1,8 @@
+"""
+固定のチャンネルにメッセージを送信する処理を行うCog  
+主にログに使用するためBotLogだが、Log以外にも使用は可能
+"""
+
 import discord
 from discord.ext import commands
 from typing import Optional, List

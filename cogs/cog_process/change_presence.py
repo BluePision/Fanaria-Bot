@@ -1,3 +1,7 @@
+"""
+Botのステータスを変更する処理を行うCog
+"""
+
 import asyncio
 import random
 from discord import CustomActivity, Game, HTTPException

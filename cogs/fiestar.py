@@ -1,3 +1,7 @@
+"""
+サーバー内機能Fiestarのチャンネルを管理するCog
+"""
+
 import discord
 from discord.ext import commands
 import asyncio

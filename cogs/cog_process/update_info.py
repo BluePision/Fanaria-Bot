@@ -1,3 +1,7 @@
+"""
+サーバー情報を更新する処理を行うCog
+"""
+
 import asyncio
 from discord import Interaction, Message, Guild, Member, TextChannel, Embed, Color, ui, components, ButtonStyle, HTTPException, AllowedMentions
 from discord.ext import commands

@@ -1,3 +1,7 @@
+"""
+時報を管理、送信するCog
+"""
+
 import os
 import discord
 from discord.ext import commands, tasks

@@ -164,6 +164,8 @@ async def load_cogs(base_path: str = "cogs") -> int:
     return loaded
 
 def count_commands(commands: list[AppCommand]) -> int:
+    """登録されたコマンドの数をカウントする"""
+
     def count_options(
         options: list[Argument | AppCommandGroup],
         group_count: int = 1
